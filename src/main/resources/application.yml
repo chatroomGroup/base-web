@@ -1,0 +1,28 @@
+
+server:
+  port: 9020
+
+
+login:
+  maxStillState: 30
+  maxReuse: 1
+
+
+web:
+  accessInterval: 1000 # ms
+  isTest: false
+
+redis:
+  host: localhost
+  port: 6379
+  password:
+  database: 3
+  max-active: 200
+  max-wait: -1
+  max-idle: 8
+  timeout: 0
+  connectionPoolSize: 200
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
