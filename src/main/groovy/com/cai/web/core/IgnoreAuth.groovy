@@ -8,7 +8,7 @@ import java.lang.annotation.Target
 
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@Target(ElementType.METHOD)
+@Target(value = [ElementType.TYPE, ElementType.METHOD])
 @interface IgnoreAuth {
 
 }

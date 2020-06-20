@@ -7,9 +7,9 @@ import org.springframework.beans.factory.support.BeanDefinitionReaderUtils
 import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.stereotype.Component
+import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.servlet.mvc.Controller
 
 @Component
 class IgnoreAuthBeanPostProcessor implements BeanPostProcessor {
@@ -22,8 +22,17 @@ class IgnoreAuthBeanPostProcessor implements BeanPostProcessor {
 
     @Override
     Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        if (bean.class.isAnnotationPresent(IgnoreAuth)){
+            bean.class.getMethods().toList().each {it->
+                if (it.isAnnotationPresent(RequestMapping)){
+                    String rootMap = getPath(bean.class.getAnnotation(RequestMapping))
+                    ignoreAuthStore.addIgnoreAuthMapping(rootMap + getPath(it.getAnnotation(RequestMapping)))
+                }
+            }
+            return bean
+        }
         if (bean.class.isAnnotationPresent(RestController) || bean.class.isAnnotationPresent(Controller)){
-            bean.class.getMethods().toList().each {it
+            bean.class.getMethods().toList().each {it->
                 if (it.isAnnotationPresent(IgnoreAuth) && it.isAnnotationPresent(RequestMapping)){
                     String rootMap = getPath(bean.class.getAnnotation(RequestMapping))
                     ignoreAuthStore.addIgnoreAuthMapping(rootMap + getPath(it.getAnnotation(RequestMapping)))
