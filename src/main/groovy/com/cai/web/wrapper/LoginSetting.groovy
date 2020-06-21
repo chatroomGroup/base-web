@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 @ConfigurationProperties(prefix = "login")
 class LoginSetting {
 
-    long maxStillState
+    String maxStillState = "0"
 
-    long maxReuse
+    String maxReuse = "0"
 }

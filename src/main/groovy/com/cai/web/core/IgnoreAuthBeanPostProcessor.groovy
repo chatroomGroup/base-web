@@ -26,7 +26,7 @@ class IgnoreAuthBeanPostProcessor implements BeanPostProcessor {
             bean.class.getMethods().toList().each {it->
                 if (it.isAnnotationPresent(RequestMapping)){
                     String rootMap = getPath(bean.class.getAnnotation(RequestMapping))
-                    ignoreAuthStore.addIgnoreAuthMapping(rootMap + getPath(it.getAnnotation(RequestMapping)))
+                    ignoreAuthStore.addIgnoreAuthMapping(rootMap + getPath(it.getAnnotation(RequestMapping)), it.isAnnotationPresent(ReturnToken))
                 }
             }
             return bean
@@ -35,7 +35,7 @@ class IgnoreAuthBeanPostProcessor implements BeanPostProcessor {
             bean.class.getMethods().toList().each {it->
                 if (it.isAnnotationPresent(IgnoreAuth) && it.isAnnotationPresent(RequestMapping)){
                     String rootMap = getPath(bean.class.getAnnotation(RequestMapping))
-                    ignoreAuthStore.addIgnoreAuthMapping(rootMap + getPath(it.getAnnotation(RequestMapping)))
+                    ignoreAuthStore.addIgnoreAuthMapping(rootMap + getPath(it.getAnnotation(RequestMapping)), it.isAnnotationPresent(ReturnToken))
                 }
             }
         }

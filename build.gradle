@@ -36,7 +36,7 @@ allprojects {
         testCompile 'junit:junit:4.12'
 
         compile group: 'org.gradle', name: 'gradle-core', version: '3.5'
-        compile group: 'com.cai', name: 'base-redis', version: '1.0.1-SNAPSHOT', changing: true
+        compile group: 'com.cai', name: 'base-redis', version: '1.0.3-SNAPSHOT', changing: true
         compile group: 'com.cai', name: 'base-general', version: '0.0.5.6-SNAPSHOT', changing: true
 
     }

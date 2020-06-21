@@ -4,13 +4,18 @@ import com.cai.redis.RedisService
 import com.cai.web.core.IgnoreAuthStore
 import com.cai.web.domain.OnlineUserDomain
 import com.cai.web.message.WebMessage
+import com.cai.web.wrapper.LoginSetting
 import com.cai.web.wrapper.WebSetting
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.lang.Nullable
 import org.springframework.stereotype.Component
+import org.springframework.web.servlet.ModelAndView
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter
 
+import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import java.util.concurrent.atomic.AtomicReference
 
 /**
  * 除了身份验证，还有访问间隔的验证
@@ -26,6 +31,9 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
 
     @Autowired
     IgnoreAuthStore ignoreAuthStore
+
+    @Autowired
+    LoginSetting loginSetting
 
     @Override
     boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
@@ -55,4 +63,12 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
         }
         return true
     }
+
+//    @Override
+//    void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
+//        OnlineUserDomain domain = new OnlineUserDomain(request.getAttribute("x-user") as String, new AtomicReference(request.getAttribute("x-token")))
+//        redisService.getJedis().psetex(domain.getAccessCacheKey() as String, loginSetting.maxReuse as long, RedisService.serialize(domain))
+//        redisService.getJedis().set(domain.getAuthCacheKey() as String, RedisService.serialize(domain))
+//        redisService.getJedis().psetex(domain.getTimeoutCacheKey() as String, loginSetting.maxStillState as long, RedisService.serialize(domain))
+//    }
 }

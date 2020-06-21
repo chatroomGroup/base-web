@@ -2,13 +2,23 @@ package com.cai.web.core
 
 import com.cai.general.core.BaseEntity
 import com.cai.general.util.response.ResponseMessage
+import com.cai.redis.RedisService
+import com.cai.web.wrapper.LoginSetting
+import org.springframework.beans.BeansException
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.ApplicationContext
+import org.springframework.context.ApplicationContextAware
+import org.springframework.stereotype.Component
+import org.springframework.web.context.support.GenericWebApplicationContext
 import redis.clients.jedis.Jedis
 
-abstract class CacheEntity extends BaseEntity{
-    List<String> cacheKeys = []
+import java.lang.reflect.Method
+import java.security.MessageDigest
+import java.text.MessageFormat
 
-    void addKeys(Collection<String> keys){
-        cacheKeys.addAll(keys)
-    }
+@Component
+class CacheEntity{
+    @Autowired
+    LoginSetting loginSetting
 
 }
