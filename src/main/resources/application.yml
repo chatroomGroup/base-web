@@ -5,7 +5,7 @@ server:
 
 login:
   maxStillState: 300000
-  maxReuse: 1000
+  maxReuse: 1
 
 
 web:

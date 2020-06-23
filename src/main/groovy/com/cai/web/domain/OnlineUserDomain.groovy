@@ -42,7 +42,7 @@ class OnlineUserDomain extends CacheEntity{
     }
 
     //访问api验证 - 作用于频繁访问场景
-    @CacheKey(command = "psetex", values = ["loginSetting.maxReuse"])
+    @CacheKey(command = "psetex", values = ["webSetting.accessInterval"])
     Object getAccessCacheKey() {
         return "ACCESS:$user:$token"
     }

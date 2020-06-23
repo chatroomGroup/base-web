@@ -71,4 +71,14 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
 //        redisService.getJedis().set(domain.getAuthCacheKey() as String, RedisService.serialize(domain))
 //        redisService.getJedis().psetex(domain.getTimeoutCacheKey() as String, loginSetting.maxStillState as long, RedisService.serialize(domain))
 //    }
+
+    @Override
+    void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable ModelAndView modelAndView) throws Exception {
+        super.postHandle(request, response, handler, modelAndView)
+    }
+
+    @Override
+    void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
+        super.afterCompletion(request, response, handler, ex)
+    }
 }

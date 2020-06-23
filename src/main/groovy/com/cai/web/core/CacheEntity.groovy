@@ -16,9 +16,6 @@ import java.lang.reflect.Method
 import java.security.MessageDigest
 import java.text.MessageFormat
 
-@Component
 class CacheEntity{
-    @Autowired
-    LoginSetting loginSetting
 
 }

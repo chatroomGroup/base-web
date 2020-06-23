@@ -1,6 +1,7 @@
 package com.cai.web.service
 
 import com.cai.redis.RedisService
+import com.cai.web.core.CacheEntity
 import com.cai.web.core.CacheKey
 import com.cai.web.domain.OnlineUserDomain
 import org.springframework.beans.factory.annotation.Autowired
@@ -28,7 +29,7 @@ class LoginService{
         }
     }
 
-    private List getKeys(OnlineUserDomain th){
+    private List getKeys(CacheEntity th){
         List<String> keyList = []
         List<Method> cacheKeys = th.class.methods.findAll { it->
             it.isAnnotationPresent(CacheKey)
