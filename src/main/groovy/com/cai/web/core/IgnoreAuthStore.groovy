@@ -2,9 +2,17 @@ package com.cai.web.core
 
 import org.springframework.stereotype.Component
 
+import javax.annotation.PostConstruct
+
 @Component
 class IgnoreAuthStore {
     Collection<MappingWrapper> store = []
+
+    @PostConstruct
+    void init(){
+        addIgnoreAuthMapping("/error", false)
+        addIgnoreAuthMapping("/templates/error", false)
+    }
 
     void addIgnoreAuthMapping(String mapping, boolean isReturnToken){
         store.add(new MappingWrapper(mapping, isReturnToken))
