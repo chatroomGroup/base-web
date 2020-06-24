@@ -10,6 +10,8 @@ import org.springframework.context.ApplicationContextAware
 import org.springframework.stereotype.Service
 import redis.clients.jedis.Jedis
 
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 import java.lang.reflect.Method
 import java.text.MessageFormat
 

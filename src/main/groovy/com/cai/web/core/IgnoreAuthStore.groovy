@@ -12,6 +12,7 @@ class IgnoreAuthStore {
     void init(){
         addIgnoreAuthMapping("/error", false)
         addIgnoreAuthMapping("/templates/error", false)
+        addIgnoreAuthMapping("/error4xx", false)
     }
 
     void addIgnoreAuthMapping(String mapping, boolean isReturnToken){

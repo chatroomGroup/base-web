@@ -1,9 +1,13 @@
 package com.cai.web.interceptor
 
 import com.cai.redis.RedisService
+import com.cai.web.core.ErrorStatusBuilder
 import com.cai.web.core.IgnoreAuthStore
+import com.cai.web.domain.ErrorStatusWrapper
 import com.cai.web.domain.OnlineUserDomain
 import com.cai.web.message.WebMessage
+import com.cai.web.service.ErrorMapping
+import com.cai.web.service.ErrorService
 import com.cai.web.wrapper.LoginSetting
 import com.cai.web.wrapper.WebSetting
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,6 +19,8 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicReference
 
 /**
@@ -35,6 +41,9 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
     @Autowired
     LoginSetting loginSetting
 
+    @Autowired
+    ErrorService errorService
+
     @Override
     boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (webSetting.isTest)
@@ -44,21 +53,25 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
         String user = request.getHeader("x-user")
         String token = request.getHeader("x-token")
         if (!user || !token){
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, WebMessage.ERROR.MSG_ERROR_0001)
+            ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0001, HttpServletResponse.SC_UNAUTHORIZED as String, request.getServletPath())
+            errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
             return false
         }
         String userStr = redisService.jedis.get(OnlineUserDomain.getAuthCacheKey(user, token) as String)
         if (!userStr){
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, WebMessage.ERROR.MSG_ERROR_0002)
+            ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0002, HttpServletResponse.SC_UNAUTHORIZED as String, request.getServletPath())
+            errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
             return false
         }
 //        OnlineUserDomain userDomain = RedisService.unSerialize(userStr, OnlineUserDomain)
         if (!redisService.jedis.get(OnlineUserDomain.getTimeoutCacheKey(user, token) as String)){
-            response.sendError(HttpServletResponse.SC_REQUEST_TIMEOUT, WebMessage.ERROR.MSG_ERROR_0004)
+            ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0004, HttpServletResponse.SC_REQUEST_TIMEOUT as String, request.getServletPath())
+            errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
             return false
         }
         if (redisService.jedis.get(OnlineUserDomain.getAccessCacheKey(user, token) as String)){
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, WebMessage.ERROR.MSG_ERROR_0003)
+            ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0003, HttpServletResponse.SC_UNAUTHORIZED as String, request.getServletPath())
+            errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
             return false
         }
         return true

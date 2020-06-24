@@ -4,12 +4,12 @@ server:
 
 
 login:
-  maxStillState: 300000
+  maxStillState: 300000 # ms
   maxReuse: 1
 
 
 web:
-  accessInterval: 1000 # ms
+  accessInterval: 10000 # ms
   isTest: false
 
 redis:
