@@ -21,7 +21,7 @@ redis:
   max-wait: -1
   max-idle: 8
   timeout: 0
-  connectionPoolSize: 200
+  connectionPoolSize: 400
 
 spring:
   main:

@@ -29,6 +29,7 @@ class LoginService{
         getKeys(onlineUserDomain).each {it->
             Object res = jedis.eval("""return redis.call($it)""")
         }
+        jedis.close()
     }
 
     private List getKeys(CacheEntity th){

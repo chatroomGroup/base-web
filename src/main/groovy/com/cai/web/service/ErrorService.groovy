@@ -34,6 +34,8 @@ enum ErrorMapping{
 
     error4xx("/error4xx")
 
+    ,error5xx("/error5xx")
+
     private String path
 
     ErrorMapping(String path) {
