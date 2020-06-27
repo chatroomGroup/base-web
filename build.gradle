@@ -6,10 +6,9 @@ allprojects {
     apply plugin: 'groovy'
     apply plugin: 'idea'
     apply plugin: 'maven'
-    apply plugin: 'war'
 
     group = 'com.cai'
-    version = '0.0.1-SNAPSHOT'
+    version = '0.0.2-SNAPSHOT'
     sourceCompatibility = '1.8'
 
     ext {
@@ -44,12 +43,22 @@ allprojects {
     [compileJava, compileTestJava, javadoc]*.options*.encoding = 'UTF-8'
 
     jar.enabled = true
-
-    war {
-        baseName = project.name
-    }
 }
 
 test {
     useJUnitPlatform()
+}
+
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "${nexusUrl}/repository/maven-releases/") {
+                authentication(userName: nexusUsername, password: nexusPassword)
+            }
+            snapshotRepository(url: "${nexusUrl}/repository/maven-snapshots/") {
+                authentication(userName: nexusUsername, password: nexusPassword)
+            }
+        }
+    }
 }

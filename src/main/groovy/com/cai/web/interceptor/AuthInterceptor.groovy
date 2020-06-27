@@ -46,7 +46,7 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
 
     @Override
     boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        if (webSetting.isTest)
+        if (webSetting.isLoose)
             return true
         if (ignoreAuthStore.hasMapping(request.getServletPath()))
             return true

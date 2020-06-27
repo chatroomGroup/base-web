@@ -10,7 +10,7 @@ login:
 
 web:
   accessInterval: 10000 # ms
-  isTest: false
+  isLoose: false
 
 redis:
   host: localhost

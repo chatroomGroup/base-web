@@ -10,5 +10,5 @@ import org.springframework.stereotype.Component
 class WebSetting {
     long accessInterval = 300
 
-    boolean isTest = false
+    boolean isLoose = false
 }
