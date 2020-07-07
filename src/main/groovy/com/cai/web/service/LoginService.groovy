@@ -1,8 +1,10 @@
 package com.cai.web.service
 
+import com.cai.general.util.log.LogParser
 import com.cai.redis.RedisService
 import com.cai.web.core.CacheEntity
 import com.cai.web.core.CacheKey
+import com.cai.web.domain.CallRedisLog
 import com.cai.web.domain.OnlineUserDomain
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
@@ -24,10 +26,12 @@ class LoginService{
     @Autowired
     ApplicationContext ac
 
+
     void toCache(OnlineUserDomain onlineUserDomain){
         Jedis jedis = redisService.getJedis()
         getKeys(onlineUserDomain).each {it->
             Object res = jedis.eval("""return redis.call($it)""")
+            ac.publishEvent(new CallRedisLog(it, res))
         }
         jedis.close()
     }
