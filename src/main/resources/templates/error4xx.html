@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<table style="width: 60%;border-collapse:separate; border-spacing:0px 15px;margin:auto;">
+    <tr>
+        <th class = "column1"><a>时间</a></th>
+        <th class = "column2"><a>状态码</a></th>
+        <th class = "column3"><a>消息</a></th>
+        <th class = "column4"><a>路径</a></th>
+    </tr>
+    <tr>
+        <th class = "column1"><a th:text="${error.datetime}"></a></th>
+        <th class = "column2"><a th:text="${error.status}"></a></th>
+        <th class = "column3"><a th:text="${error.msg}"></a></th>
+        <th class = "column4"><a th:text="${error.path}"></a></th>
+    </tr>
+</table>
+</body>
+</html>
