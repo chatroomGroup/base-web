@@ -2,7 +2,6 @@ package com.cai.web.controller
 
 import com.cai.general.util.response.ResponseMessage
 import com.cai.general.util.response.ResponseMessageFactory
-import com.cai.redis.RedisService
 import com.cai.web.core.IgnoreAuth
 import com.cai.web.core.IgnoreAuthStore
 import com.cai.web.core.ReturnToken

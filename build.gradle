@@ -35,7 +35,7 @@ allprojects {
         testCompile 'junit:junit:4.12'
         compile group: 'org.springframework.boot', name: 'spring-boot-starter-thymeleaf', version: "${SPRING_BOOT_VERSION}"
         compile group: 'org.gradle', name: 'gradle-core', version: '3.5'
-        compile group: 'com.cai', name: 'base-redis', version: '1.0.3-SNAPSHOT', changing: true
+        compile group: 'com.cai', name: 'base-redis', version: '1.1.3-RELEASE', changing: true
         compile group: 'com.cai', name: 'base-general', version: '0.0.6.4-SNAPSHOT', changing: true
 
     }

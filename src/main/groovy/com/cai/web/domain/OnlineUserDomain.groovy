@@ -1,6 +1,5 @@
 package com.cai.web.domain
 
-import com.cai.redis.RedisService
 import com.cai.web.core.CacheEntity
 import com.cai.web.core.CacheKey
 import redis.clients.jedis.Jedis

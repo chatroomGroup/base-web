@@ -1,7 +1,7 @@
 package com.cai.web.service
 
 import com.cai.general.util.log.LogParser
-import com.cai.redis.RedisService
+import com.cai.redis.redis.RedisService
 import com.cai.web.core.CacheEntity
 import com.cai.web.core.CacheKey
 import com.cai.web.domain.CallRedisLog
