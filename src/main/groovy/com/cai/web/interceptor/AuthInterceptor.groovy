@@ -1,6 +1,7 @@
 package com.cai.web.interceptor
 
-import com.cai.redis.redis.RedisService
+import com.cai.redis.RedisService
+import com.cai.redis.op.OpJedis
 import com.cai.web.core.ErrorStatusBuilder
 import com.cai.web.core.IgnoreAuthStore
 import com.cai.web.domain.ErrorStatusWrapper
@@ -52,7 +53,7 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
             return true
         String user = request.getHeader("x-user")
         String token = request.getHeader("x-token")
-        return redisService.tryAndGetOpJedis{op->
+        return redisService.tryAndGetOpJedis{OpJedis<Boolean> op->
             if (!user || !token){
                 ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0001, HttpServletResponse.SC_UNAUTHORIZED as String, request.getServletPath())
                 errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)

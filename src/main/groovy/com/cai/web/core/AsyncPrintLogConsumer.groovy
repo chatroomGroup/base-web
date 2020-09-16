@@ -4,13 +4,14 @@ import com.cai.general.util.log.Log
 import com.cai.general.util.log.LogParser
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Primary
 import org.springframework.context.event.EventListener
 import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Component
 
-@Primary
 @Component
+@ConditionalOnMissingBean(LogParser)
 class AsyncPrintLogConsumer extends LogParser{
 
     Logger logger = LoggerFactory.getLogger(AsyncPrintLogConsumer)
