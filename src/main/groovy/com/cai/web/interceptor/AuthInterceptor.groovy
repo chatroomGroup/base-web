@@ -53,7 +53,7 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
             return true
         String user = request.getHeader("x-user")
         String token = request.getHeader("x-token")
-        return redisService.tryAndGetOpJedis{OpJedis<Boolean> op->
+        return redisService.tryAndGetOpJedis{op->
             if (!user || !token){
                 ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0001, HttpServletResponse.SC_UNAUTHORIZED as String, request.getServletPath())
                 errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)

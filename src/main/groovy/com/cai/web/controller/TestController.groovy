@@ -46,6 +46,7 @@ class TestController {
         return ResponseMessageFactory.success("login")
     }
 
+    @IgnoreAuth
     @RequestMapping(path = "/login2")
     ResponseMessage test2(){
         return ResponseMessageFactory.success("login")
