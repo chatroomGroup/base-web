@@ -1,5 +1,7 @@
 package com.cai.web.interceptor
 
+import com.cai.general.core.Session
+import com.cai.general.util.log.ErrorLogManager
 import com.cai.redis.RedisService
 import com.cai.redis.op.OpJedis
 import com.cai.web.core.ErrorStatusBuilder
@@ -53,32 +55,41 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
             return true
         String user = request.getHeader("x-user")
         String token = request.getHeader("x-token")
-        return redisService.tryAndGetOpJedis{op->
-            if (!user || !token){
-                ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0001, HttpServletResponse.SC_UNAUTHORIZED as String, request.getServletPath())
-                errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
-                return false
-            }
-            String userStr = op.get(OnlineUserDomain.getAuthCacheKey(user, token) as String)
-            if (!userStr){
-                ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0002, HttpServletResponse.SC_UNAUTHORIZED as String, request.getServletPath())
-                errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
-                return false
-            }
+        try{
+            return redisService.tryAndGetOpJedis{op->
+                if (!user || !token){
+                    ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0001, HttpServletResponse.SC_UNAUTHORIZED as String, request.getServletPath())
+                    errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
+                    return false
+                }
+                String userStr = op.get(OnlineUserDomain.getAuthCacheKey(user, token) as String)
+                if (!userStr){
+                    ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0002, HttpServletResponse.SC_UNAUTHORIZED as String, request.getServletPath())
+                    errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
+                    return false
+                }
 //        OnlineUserDomain userDomain = RedisService.unSerialize(userStr, OnlineUserDomain)
-            if (!op.get(OnlineUserDomain.getTimeoutCacheKey(user, token) as String)){
-                op.del(OnlineUserDomain.getAuthCacheKey(user, token) as String)
-                ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0004, HttpServletResponse.SC_REQUEST_TIMEOUT as String, request.getServletPath())
-                errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
-                return false
+                if (!op.get(OnlineUserDomain.getTimeoutCacheKey(user, token) as String)){
+                    op.del(OnlineUserDomain.getAuthCacheKey(user, token) as String)
+                    ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0004, HttpServletResponse.SC_REQUEST_TIMEOUT as String, request.getServletPath())
+                    errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
+                    return false
+                }
+                if (op.get(OnlineUserDomain.getAccessCacheKey(user, token) as String)){
+                    ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0003, HttpServletResponse.SC_UNAUTHORIZED as String, request.getServletPath())
+                    errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
+                    return false
+                }
+                return true
             }
-            if (op.get(OnlineUserDomain.getAccessCacheKey(user, token) as String)){
-                ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0003, HttpServletResponse.SC_UNAUTHORIZED as String, request.getServletPath())
-                errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
-                return false
-            }
-            return true
+        }catch(Throwable t){
+            Session sess = new Session()
+            sess.setUser(user)
+            sess.setToken(token)
+            t.printStackTrace()
+            ErrorLogManager.logException(sess ,t)
         }
+
 
 
     }

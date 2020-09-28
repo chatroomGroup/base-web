@@ -10,5 +10,10 @@ class WebMessage {
 
         final static String MSG_ERROR_0004= "链接超时，请重新登录"
 
+        final static String MSG_ERROR_0005= "请输入账号"
+
+        final static String MSG_ERROR_0006= "账号不存在"
+
+        final static String MSG_ERROR_0007= "账号已被锁定 请联系管理员"
     }
 }
