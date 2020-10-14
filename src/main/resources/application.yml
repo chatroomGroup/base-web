@@ -2,18 +2,23 @@
 server:
   port: 9020
 
+app:
+  name: base-web
+  error-log:
+    collection: error_log
+    expireDay: 30
 
 login:
   maxStillState: 300000 # ms
   maxReuse: 1
 
 web:
-  accessInterval: 10000 # ms
+  accessInterval: 1000000 # ms
   isLoose: false
 
 redis:
   host: localhost
-  port: 6379
+  port: 6380
   password:
   database: 3
   max-active: 200
@@ -48,3 +53,13 @@ datasources:
 
 jap:
   enable: true
+
+
+mongo:
+  host: 127.0.0.1
+  port: 27017
+  database: base-web
+  password:
+  username:
+  authenticationDatabase:
+  connectionPerHost: 5
