@@ -1,16 +1,19 @@
 package com.cai.web.interceptor
 
+import com.cai.general.core.App
 import com.cai.general.core.Session
 import com.cai.general.util.log.ErrorLogManager
 import com.cai.redis.RedisService
 import com.cai.redis.op.OpJedis
 import com.cai.web.core.ErrorStatusBuilder
 import com.cai.web.core.IgnoreAuthStore
+import com.cai.web.core.MappingWrapper
 import com.cai.web.domain.ErrorStatusWrapper
 import com.cai.web.domain.OnlineUserDomain
 import com.cai.web.message.WebMessage
 import com.cai.web.service.ErrorMapping
 import com.cai.web.service.ErrorService
+import com.cai.web.service.LoginService
 import com.cai.web.wrapper.LoginSetting
 import com.cai.web.wrapper.WebSetting
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,7 +28,7 @@ import javax.servlet.http.HttpServletResponse
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicReference
-
+import static com.cai.general.util.session.SessionUtils.*
 /**
  * 除了身份验证，还有访问间隔的验证
  */
@@ -47,6 +50,11 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
     @Autowired
     ErrorService errorService
 
+    @Autowired
+    App app
+
+    @Autowired
+    LoginService lgSvc
     @Override
     boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         if (webSetting.isLoose)
@@ -55,6 +63,10 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
             return true
         String user = request.getHeader("x-user")
         String token = request.getHeader("x-token")
+        String app = request.getHeader("x-app")?:app.name
+        String locale = request.getHeader("x-locale")?:"zh"
+        String client = request.getHeader("x-client")?:getIPAddress(request)
+        String port = request.getHeader("x-port")?:request.getRemotePort()
         try{
             return redisService.tryAndGetOpJedis{op->
                 if (!user || !token){
@@ -80,6 +92,7 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
                     errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
                     return false
                 }
+                saveSession(request, createSession(user, token, app, client, port, locale))
                 return true
             }
         }catch(Throwable t){
@@ -89,9 +102,6 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
             t.printStackTrace()
             ErrorLogManager.logException(sess ,t)
         }
-
-
-
     }
 
 //    @Override
@@ -105,10 +115,56 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
     @Override
     void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable ModelAndView modelAndView) throws Exception {
         super.postHandle(request, response, handler, modelAndView)
+        if (ignoreAuthStore.hasMapping(request.getServletPath())){
+            MappingWrapper wrapper = ignoreAuthStore.getMapping(request.getServletPath())
+            if (wrapper.isReturnToken){
+                Session sess = request.getAttribute("sess")
+                String token = sess.token?:ignoreAuthStore.returnToken(request.getServletPath())
+                response.addCookie(new Cookie("x-token", sess.token))
+                response.addCookie(new Cookie("x-user", sess.user))
+                response.addCookie(new Cookie("x-app", sess.app?:app.name))
+                lgSvc.toCache(new OnlineUserDomain(sess.user, new AtomicReference<String>(token)))
+            }
+        }
+
     }
 
     @Override
     void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable Exception ex) throws Exception {
         super.afterCompletion(request, response, handler, ex)
+    }
+
+    static String getIPAddress(HttpServletRequest request) {
+        String ip = null;
+
+        //X-Forwarded-For：Squid 服务代理
+        String ipAddresses = request.getHeader("X-Forwarded-For");
+        if (ipAddresses == null || ipAddresses.length() == 0 || "unknown".equalsIgnoreCase(ipAddresses)) {
+            //Proxy-Client-IP：apache 服务代理
+            ipAddresses = request.getHeader("Proxy-Client-IP");
+        }
+        if (ipAddresses == null || ipAddresses.length() == 0 || "unknown".equalsIgnoreCase(ipAddresses)) {
+            //WL-Proxy-Client-IP：weblogic 服务代理
+            ipAddresses = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ipAddresses == null || ipAddresses.length() == 0 || "unknown".equalsIgnoreCase(ipAddresses)) {
+            //HTTP_CLIENT_IP：有些代理服务器
+            ipAddresses = request.getHeader("HTTP_CLIENT_IP");
+        }
+        if (ipAddresses == null || ipAddresses.length() == 0 || "unknown".equalsIgnoreCase(ipAddresses)) {
+            //X-Real-IP：nginx服务代理
+            ipAddresses = request.getHeader("X-Real-IP");
+        }
+
+        //有些网络通过多层代理，那么获取到的ip就会有多个，一般都是通过逗号（,）分割开来，并且第一个ip为客户端的真实IP
+        if (ipAddresses != null && ipAddresses.length() != 0) {
+            ip = ipAddresses.split(",")[0];
+        }
+
+        //还是不能获取到，最后再通过request.getRemoteAddr();获取
+        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ipAddresses)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip.equals("0:0:0:0:0:0:0:1")?"127.0.0.1":ip;
     }
 }

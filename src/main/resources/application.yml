@@ -13,7 +13,7 @@ login:
   maxReuse: 1
 
 web:
-  accessInterval: 1000000 # ms
+  accessInterval: 1000 # ms
   isLoose: false
 
 redis:

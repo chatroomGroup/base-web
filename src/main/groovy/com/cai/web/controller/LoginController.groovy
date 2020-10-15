@@ -1,5 +1,7 @@
 package com.cai.web.controller
 
+import com.cai.general.core.App
+import com.cai.general.core.BaseController
 import com.cai.general.util.response.ResponseMessage
 import com.cai.general.util.response.ResponseMessageFactory
 import com.cai.redis.RedisLockService
@@ -25,9 +27,12 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.atomic.AtomicReference
 
+import static com.cai.general.util.session.SessionUtils.createSession
+import static com.cai.general.util.session.SessionUtils.saveSession
+
 @RestController
-@RequestMapping("/test")
-class TestController {
+@RequestMapping("/rest/login")
+class LoginController extends BaseController{
 
     @Autowired
     IgnoreAuthStore ignoreAuthStore
@@ -40,6 +45,9 @@ class TestController {
 
     @Autowired
     RedisLockService rlSvc
+
+    @Autowired
+    App app
 
     @IgnoreAuth
     @ReturnToken
@@ -64,15 +72,16 @@ class TestController {
             })
             return ResponseMessageFactory.error(WebMessage.ERROR.MSG_ERROR_0007)
         }
+        // 第一次登陆 需要创建session
         String token = ignoreAuthStore.returnToken(request.getServletPath())
-        response.addCookie(new Cookie("x-token", token))
-        response.addCookie(new Cookie("x-user", account))
-        loginService.toCache(new OnlineUserDomain(account, new AtomicReference<String>(token)))
+        saveSession(request, createSession(account, token, app.name, null, null, null))
+
         return ResponseMessageFactory.success("login")
     }
 
     @RequestMapping(path = "/login2")
-    ResponseMessage test2(){
+    ResponseMessage test2(HttpServletRequest request){
+        println getSession(request)
         return ResponseMessageFactory.success("login")
     }
 }
