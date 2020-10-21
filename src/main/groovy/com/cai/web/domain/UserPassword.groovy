@@ -31,6 +31,8 @@ class UserPassword {
 
     Integer version
 
+    String lastUpdated
+
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = User)
     @JoinColumn(name = "userId", referencedColumnName = "id")
     User user

@@ -31,7 +31,7 @@ import static com.cai.general.util.session.SessionUtils.createSession
 import static com.cai.general.util.session.SessionUtils.saveSession
 
 @RestController
-@RequestMapping("/rest/login")
+@RequestMapping("/rest/user")
 class LoginController extends BaseController{
 
     @Autowired

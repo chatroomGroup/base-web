@@ -119,6 +119,7 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
             MappingWrapper wrapper = ignoreAuthStore.getMapping(request.getServletPath())
             if (wrapper.isReturnToken){
                 Session sess = request.getAttribute("sess")
+                if (!sess)  return
                 String token = sess.token?:ignoreAuthStore.returnToken(request.getServletPath())
                 response.addCookie(new Cookie("x-token", sess.token))
                 response.addCookie(new Cookie("x-user", sess.user))

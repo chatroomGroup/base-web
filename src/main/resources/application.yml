@@ -40,7 +40,7 @@ datasources:
   statu: 1
   instants:
     instant-1:
-      url: jdbc:mysql://localhost:3306/users?autoReconnect=true&failOverReadOnly=false&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&useOldAliasMetadataBehavior=true
+      url: jdbc:mysql://localhost:3306/users?autoReconnect=true&failOverReadOnly=false&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=GMT%2B8&useOldAliasMetadataBehavior=true
       username: root
       password: 123
       driverClassName: com.mysql.jdbc.Driver

@@ -2,6 +2,7 @@ package com.cai.web.domain
 
 import com.cai.general.core.BaseEntity
 import com.cai.general.core.EntityType
+import com.cai.web.dao.UserRepository
 import org.springframework.stereotype.Component
 
 import javax.persistence.CascadeType
@@ -12,6 +13,7 @@ import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.OneToOne
 import javax.persistence.Table
+import java.sql.Timestamp
 
 @Component
 @Entity(name = User.TABLE_NAME)
@@ -20,8 +22,9 @@ class User extends BaseEntity{
 
     static DEFINE = define([
             table: TABLE_NAME,
-            cache: false,
-            type: EntityType.SQL
+            cache: true,
+            type: EntityType.SQL,
+            repository: UserRepository.class
     ])
 
     final static String TABLE_NAME = "g_user";
@@ -49,6 +52,10 @@ class User extends BaseEntity{
     String userDef5
 
     Integer version
+
+    Timestamp lastUpdated
+
+    String lastUpdatedBy
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = UserPassword)
     @JoinColumn(name = "id", referencedColumnName = "userId")
