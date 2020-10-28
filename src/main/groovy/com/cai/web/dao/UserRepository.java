@@ -18,11 +18,11 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     @FindCache(targetClass = User.class, validateSql = "select gu.id,gu.lastUpdated from g_user gu " +
-            "left join g_user_password gup on gup.userId = gu.id and gup.password = ?" +
+            "inner join g_user_password gup on gup.userId = gu.id and gup.password = ?" +
             " where gu.account = ?", param = "1,0")
     @Query(nativeQuery = true,
             value = "select gu.* from g_user gu " +
-                    "left join g_user_password gup on gup.userId = gu.id and gup.password = ?2" +
+                    "inner join g_user_password gup on gup.userId = gu.id and gup.password = ?2" +
                         " where gu.account = ?1"
     )
     List<User> getUserByAccountAndPassword(String account, String password);
