@@ -9,6 +9,7 @@ import javax.persistence.CascadeType
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.OneToOne
@@ -30,7 +31,7 @@ class User extends BaseEntity{
     final static String TABLE_NAME = "g_user";
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id
 
     String account
@@ -39,7 +40,7 @@ class User extends BaseEntity{
 
     String created
 
-    Integer status
+    Integer status = Status.UserStatus.OPEN
 
     String userDef1
 
@@ -57,9 +58,9 @@ class User extends BaseEntity{
 
     String lastUpdatedBy
 
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = UserPassword)
-    @JoinColumn(name = "id", referencedColumnName = "userId")
-    UserPassword userPassword
+//    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = UserPassword)
+//    @JoinColumn(name = "id", referencedColumnName = "userId")
+//    UserPassword userPassword
 
     @Override
     Object getEntityId() {

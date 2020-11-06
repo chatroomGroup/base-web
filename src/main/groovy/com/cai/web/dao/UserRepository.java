@@ -1,6 +1,7 @@
 package com.cai.web.dao;
 
 import com.cai.cache.annotation.FindCache;
+import com.cai.cache.annotation.GetCache;
 import com.cai.cache.annotation.UpdateCache;
 import com.cai.web.domain.User;
 import com.google.common.collect.Lists;
@@ -34,4 +35,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
             value = "update #{#entityName} set status = 0 where id in (:ids)"
     )
     Integer disableAccountStatusByIds(@Param("ids") List<Long> ids);
+
+
+    boolean existsByAccount(String account);
+
+    @GetCache(targetClass = User.class)
+    User getDistinctByAccount(String account);
 }
