@@ -28,7 +28,7 @@ class UserService extends BaseService<User>{
     }
 
     @Override
-    void beforeDelete(Session sess, User obj) {
+    ResponseMessage afterDelete(Session sess, User obj) {
         // 删除所有相关联的userPassword
         upSvc.deleteEntityByUserId(sess, obj.id)
     }

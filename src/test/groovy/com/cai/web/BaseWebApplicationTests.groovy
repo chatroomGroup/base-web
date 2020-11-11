@@ -12,6 +12,7 @@ import com.cai.web.domain.UserPassword
 import com.cai.web.service.UserPasswordService
 import com.cai.web.service.UserService
 import org.junit.After
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -40,8 +41,8 @@ class BaseWebApplicationTests {
 
     Session sess
 
-    @After
-    void after(){
+    @Before
+    void before(){
         sess = SessionUtils.createSession("test","test",app.name)
     }
     @Test
@@ -67,5 +68,14 @@ class BaseWebApplicationTests {
     void delete(){
         User user = userRepository.getDistinctByAccount("test")
         usSvc.deleteEntity(sess, user)
+    }
+
+    @Test
+    void getEntity(){
+        User user = new User()
+        user.id = 1L
+        user = usSvc.getEntity(sess, user)
+        user = usSvc.getEntity(sess, user)
+        println user
     }
 }
