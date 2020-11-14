@@ -8,7 +8,7 @@ import com.cai.redis.RedisLockService
 import com.cai.web.core.IgnoreAuth
 import com.cai.web.core.IgnoreAuthStore
 import com.cai.web.core.ReturnToken
-import com.cai.web.dao.UserRepository
+import com.cai.web.dao.UserMapper
 import com.cai.web.domain.OnlineUserDomain
 import com.cai.web.domain.Status
 import com.cai.web.domain.User
@@ -16,6 +16,7 @@ import com.cai.web.message.WebMessage
 import com.cai.web.service.LoginService
 import com.cai.web.wrapper.LoginSetting
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -41,13 +42,13 @@ class LoginController extends BaseController{
     LoginService loginService
 
     @Autowired
-    UserRepository userRep
-
-    @Autowired
     RedisLockService rlSvc
 
     @Autowired
     App app
+
+    @Autowired
+    UserMapper userMapper
 
     @IgnoreAuth
     @ReturnToken
@@ -59,7 +60,7 @@ class LoginController extends BaseController{
         String password = params.get("password")
         if (!account)
             return ResponseMessageFactory.error(WebMessage.ERROR.MSG_ERROR_0005)
-        List<User> user = userRep.getUserByAccountAndPassword(account, password)
+        List<User> user = userMapper.getUserByAccountAndPassword(account, password)
         if (!user || user.isEmpty())
             return ResponseMessageFactory.error(WebMessage.ERROR.MSG_ERROR_0006)
         if (user[0].status != Status.UserStatus.OPEN){
@@ -68,7 +69,7 @@ class LoginController extends BaseController{
         //账号被锁定 相同账号是不被允许的
         if (user.size() > 1) {
             rlSvc.tryOpLock(user[0].getCacheKey(), {
-                userRep.disableAccountStatusByIds(user.collect { it.id })
+                userMapper.disableAccountStatusByIds(user.collect { it.id })
             })
             return ResponseMessageFactory.error(WebMessage.ERROR.MSG_ERROR_0007)
         }

@@ -9,7 +9,7 @@ app:
     expireDay: 30
 
 login:
-  maxStillState: 300000 # ms
+  maxStillState: 3000000 # ms
   maxReuse: 1
 
 web:
@@ -30,14 +30,14 @@ redis:
 spring:
   main:
     allow-bean-definition-overriding: true
-  jpa:
-    hibernate:
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
-    open-in-view: true
-    properties:
-      hibernate:
-        enable_lazy_load_no_trans: true
+#  jpa:
+#    hibernate:
+#      naming:
+#        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+#    open-in-view: true
+#    properties:
+#      hibernate:
+#        enable_lazy_load_no_trans: true
 
 
 datasources:
@@ -55,8 +55,8 @@ datasources:
       type: com.alibaba.druid.pool.DruidDataSource
       isDefault: true
 
-jap:
-  enable: true
+#jap:
+#  enable: true
 
 
 mongo:

@@ -1,9 +1,10 @@
 package com.cai.web.domain
 
+import com.baomidou.mybatisplus.annotation.TableId
+import com.baomidou.mybatisplus.annotation.TableName
 import com.cai.general.core.BaseEntity
 import com.cai.general.core.EntityType
-import com.cai.web.dao.UserPasswordRepository
-import com.cai.web.dao.UserRepository
+import com.cai.web.dao.UserPasswordMapper
 import org.springframework.stereotype.Component
 
 import javax.persistence.CascadeType
@@ -17,22 +18,19 @@ import javax.persistence.OneToOne
 import javax.persistence.Table
 
 @Component
-@Entity(name = UserPassword.TABLE_NAME)
-@Table(name = UserPassword.TABLE_NAME)
+@TableName(UserPassword.TABLE_NAME)
 class UserPassword extends BaseEntity{
 
     static DEFINE = define([
             table: TABLE_NAME,
             cache: true,
             type: EntityType.SQL,
-            repository: UserPasswordRepository.class
+            mapper: UserPasswordMapper.class
     ])
 
     final static String TABLE_NAME = "g_user_password";
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id
+    long id
 
     String password
 

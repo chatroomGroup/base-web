@@ -2,12 +2,13 @@ package com.cai.web.service
 
 import com.cai.general.core.BaseService
 import com.cai.general.core.Session
+import com.cai.general.util.log.ErrorLogManager
 import com.cai.general.util.response.ResponseMessage
 import com.cai.general.util.response.ResponseMessageFactory
-import com.cai.web.dao.UserPasswordRepository
-import com.cai.web.dao.UserRepository
+import com.cai.web.dao.UserMapper
 import com.cai.web.domain.User
 import com.cai.web.message.UserMessage
+import com.cai.web.message.WebMessage
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -15,21 +16,39 @@ import org.springframework.stereotype.Service
 class UserService extends BaseService<User>{
 
     @Autowired
-    UserRepository userRepository
+    UserMapper userMapper
 
     @Autowired
     UserPasswordService upSvc
 
     @Override
-    ResponseMessage afterCreate(Session sess, User obj) {
-        if (userRepository.existsByAccount(obj.account))
+    ResponseMessage beforeCreate(Session sess, User obj) {
+        if (!userMapper.existsByAccount(obj.account).empty)
             return ResponseMessageFactory.error(UserMessage.ERROR.USER_ERROR_0001, obj.account)
         return ResponseMessageFactory.success()
     }
 
     @Override
     ResponseMessage afterDelete(Session sess, User obj) {
+        redisService.tryOpJedis{op->
+            //删除对应缓存信息
+            op.del(obj.getCacheKey())
+        }
         // 删除所有相关联的userPassword
         upSvc.deleteEntityByUserId(sess, obj.id)
+    }
+
+    ResponseMessage destroyUserInfo(Session sess, String account){
+        ResponseMessage rsp = ResponseMessageFactory.success()
+        try{
+            User user = userMapper.getFirstByAccount(account)
+            if (user)
+                rsp = deleteEntity(sess, user)
+            return rsp
+        }catch(Throwable t){
+            ErrorLogManager.logException(sess, t)
+            return ResponseMessageFactory.error(WebMessage.ERROR.MSG_ERROR_0000)
+        }
+
     }
 }

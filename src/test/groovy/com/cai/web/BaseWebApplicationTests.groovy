@@ -6,7 +6,7 @@ import com.cai.general.core.Session
 import com.cai.general.util.encode.EncryptionEntity
 import com.cai.general.util.encode.PasswordUtil
 import com.cai.general.util.session.SessionUtils
-import com.cai.web.dao.UserRepository
+import com.cai.web.dao.UserMapper
 import com.cai.web.domain.User
 import com.cai.web.domain.UserPassword
 import com.cai.web.service.UserPasswordService
@@ -34,7 +34,7 @@ class BaseWebApplicationTests {
     App app
 
     @Autowired
-    UserRepository userRepository
+    UserMapper userRepository
 
     @Autowired
     UserPasswordService upSvc
