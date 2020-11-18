@@ -2,6 +2,7 @@ package com.cai.web.controller
 
 import com.cai.general.core.App
 import com.cai.general.core.BaseController
+import com.cai.general.util.encode.PasswordUtil
 import com.cai.general.util.response.ResponseMessage
 import com.cai.general.util.response.ResponseMessageFactory
 import com.cai.redis.RedisLockService
@@ -12,8 +13,10 @@ import com.cai.web.dao.UserMapper
 import com.cai.web.domain.OnlineUserDomain
 import com.cai.web.domain.Status
 import com.cai.web.domain.User
+import com.cai.web.domain.UserPassword
 import com.cai.web.message.WebMessage
 import com.cai.web.service.LoginService
+import com.cai.web.service.UserPasswordService
 import com.cai.web.wrapper.LoginSetting
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PathVariable
@@ -36,48 +39,30 @@ import static com.cai.general.util.session.SessionUtils.saveSession
 class LoginController extends BaseController{
 
     @Autowired
-    IgnoreAuthStore ignoreAuthStore
-
-    @Autowired
     LoginService loginService
 
     @Autowired
-    RedisLockService rlSvc
+    IgnoreAuthStore ignoreAuthStore
 
     @Autowired
     App app
-
-    @Autowired
-    UserMapper userMapper
 
     @IgnoreAuth
     @ReturnToken
     @RequestMapping(path = "/login", method = RequestMethod.POST)
     ResponseMessage login(HttpServletRequest request, HttpServletResponse response, @RequestBody Map params) {
-        //
         //账号验证
+        ResponseMessage rsp = validateMapParamsNotNull(params)
+        if (!rsp.isSuccess)
+            return rsp
+
         String account = params.get("account")
         String password = params.get("password")
-        if (!account)
-            return ResponseMessageFactory.error(WebMessage.ERROR.MSG_ERROR_0005)
-        List<User> user = userMapper.getUserByAccountAndPassword(account, password)
-        if (!user || user.isEmpty())
-            return ResponseMessageFactory.error(WebMessage.ERROR.MSG_ERROR_0006)
-        if (user[0].status != Status.UserStatus.OPEN){
-            return ResponseMessageFactory.error(WebMessage.ERROR.MSG_ERROR_0007)
-        }
-        //账号被锁定 相同账号是不被允许的
-        if (user.size() > 1) {
-            rlSvc.tryOpLock(user[0].getCacheKey(), {
-                userMapper.disableAccountStatusByIds(user.collect { it.id })
-            })
-            return ResponseMessageFactory.error(WebMessage.ERROR.MSG_ERROR_0007)
-        }
+        rsp = loginService.login(null, account, password)
         // 第一次登陆 需要创建session
         String token = ignoreAuthStore.returnToken(request.getServletPath())
         saveSession(request, createSession(account, token, app.name, null, null, null))
-
-        return ResponseMessageFactory.success("login")
+        return rsp
     }
 
     @RequestMapping(path = "/login2")

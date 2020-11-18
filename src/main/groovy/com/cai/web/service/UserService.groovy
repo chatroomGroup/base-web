@@ -51,4 +51,8 @@ class UserService extends BaseService<User>{
         }
 
     }
+
+    User getEntity(Session sess, String account){
+        return userMapper.getFirstByAccount(account)
+    }
 }

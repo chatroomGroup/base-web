@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableName
 import com.cai.general.core.BaseEntity
 import com.cai.general.core.EntityType
 import com.cai.web.dao.UserMapper
+import org.apache.ibatis.annotations.Mapper
 import org.springframework.stereotype.Component
 import java.sql.Timestamp
 
@@ -25,29 +26,41 @@ class User extends BaseEntity{
     @TableId
     long id
 
-    String account
+    @TableField("account")
+    String account;
 
-    String name
+    @TableField("name")
+    String name;
 
-    String created
+    @TableField("created")
+    String created;
 
-    Integer status = Status.UserStatus.OPEN
+    @TableField("status")
+    Integer status;
 
-    String userDef1
+    @TableField("userDef1")
+    String userDef1;
 
-    String userDef2
+    @TableField("userDef2")
+    String userDef2;
 
-    String userDef3
+    @TableField("userDef3")
+    String userDef3;
 
-    String userDef4
+    @TableField("userDef4")
+    String userDef4;
 
-    String userDef5
+    @TableField("userDef5")
+    String userDef5;
 
-    Integer version
+    @TableField("version")
+    Integer version;
 
-    Timestamp lastUpdated
+    @TableField("lastUpdated")
+    Timestamp lastUpdated;
 
-    String lastUpdatedBy
+    @TableField("lastUpdatedBy")
+    String lastUpdatedBy;
 
 //    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = UserPassword)
 //    @JoinColumn(name = "id", referencedColumnName = "userId")

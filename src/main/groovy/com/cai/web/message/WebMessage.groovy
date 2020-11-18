@@ -19,5 +19,10 @@ class WebMessage {
         final static String MSG_ERROR_0007= "账号已被锁定 请联系管理员"
 
         final static String MSG_ERROR_0008= "出现并发问题"
+
+        final static String MSG_ERROR_0009= "密码错误"
+
+        final static String MSG_ERROR_0010= "请输入密码"
+
     }
 }

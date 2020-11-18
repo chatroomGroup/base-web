@@ -9,7 +9,7 @@ import org.springframework.context.annotation.ComponentScans
 import org.springframework.scheduling.annotation.EnableAsync
 
 @EnableAsync
-@MapperScan("com.cai.web.dao.*")
+//@MapperScan("com.cai.web.*")
 @SpringBootApplication(exclude = MongoAutoConfiguration.class)
 class BaseWebApplication {
 

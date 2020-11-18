@@ -38,6 +38,13 @@ class RegisterService extends BaseService{
     @Autowired
     RedisLockService redisLockService
 
+    /**
+     * 注册用户
+     * @param account
+     * @param name
+     * @param password
+     * @return
+     */
     ResponseMessage register(String account, String name, String password){
         User newUser = new User()
         UserPassword newPassword = new UserPassword()
@@ -56,8 +63,8 @@ class RegisterService extends BaseService{
                 jdbcTemplate.rollback()
                 return rsp
             }
-            newUser = userService.getEntity(session, newUser)
-            if (!userService)
+            newUser = userService.getEntity(session, newUser.account)
+            if (!newUser)
                 return ResponseMessageFactory.error(UserMessage.ERROR.USER_ERROR_0002)
 
             // 创建userPassword
@@ -76,6 +83,8 @@ class RegisterService extends BaseService{
             t.printStackTrace()
             ErrorLogManager.logException(session, t)
             jdbcTemplate.rollback() // 回滚
+            return ResponseMessageFactory.error(WebMessage.ERROR.MSG_ERROR_0000)
+        }finally{
             if (rLock)
                 rLock.unlock() // 解锁
         }

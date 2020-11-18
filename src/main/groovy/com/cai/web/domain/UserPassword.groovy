@@ -1,5 +1,6 @@
 package com.cai.web.domain
 
+import com.baomidou.mybatisplus.annotation.TableField
 import com.baomidou.mybatisplus.annotation.TableId
 import com.baomidou.mybatisplus.annotation.TableName
 import com.cai.general.core.BaseEntity
@@ -30,26 +31,34 @@ class UserPassword extends BaseEntity{
 
     final static String TABLE_NAME = "g_user_password";
 
+    @TableId
     long id
 
+    @TableField("password")
     String password
 
+    @TableField("salt")
     String salt
 
+    @TableField("created")
     String created
 
+    @TableField("createdBy")
     String createdBy
 
+    @TableField("lastUpdatedBy")
     String lastUpdatedBy
 
+    @TableField("version")
     Integer version
 
+    @TableField("lastUpdated")
     String lastUpdated
 
 //    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, targetEntity = User)
 //    @JoinColumn(name = "userId", referencedColumnName = "id")
 //    User user
-
+    @TableField("userId")
     long userId
 
     @Override

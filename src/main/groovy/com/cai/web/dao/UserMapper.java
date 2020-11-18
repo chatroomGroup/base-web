@@ -5,6 +5,7 @@ import com.cai.cache.annotation.GetCache;
 import com.cai.cache.annotation.UpdateCache;
 import com.cai.general.core.BaseMapper;
 import com.cai.web.domain.User;
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,7 +17,7 @@ import org.springframework.stereotype.Repository;
 import javax.transaction.Transactional;
 import java.util.List;
 
-
+@Mapper
 @Component
 public interface UserMapper extends BaseMapper<User> {
 
@@ -34,10 +35,15 @@ public interface UserMapper extends BaseMapper<User> {
     @Select(value = "update g_user set status = 0 where id in ( #{ids} )")
     Integer disableAccountStatusByIds(@Param("ids") List<Long> ids);
 
-    @Select(value = "select * from g_user where account = #{account}")
+    @FindCache(targetClass = User.class, validateSql = "select * from g_user where account = ?", param = "0")
+    @Select(value = "select id, lastUpdated from g_user where account = #{account}")
     List<User> existsByAccount(@Param("account") String account);
 
     @GetCache(targetClass = User.class)
     @Select(value = "select * from g_user where account = #{account} limit 1")
     User getFirstByAccount(@Param("account") String account);
+
+    @FindCache(targetClass = User.class, validateSql = "select * from g_user where account = ?", param = "0")
+    @Select(value = "select * from g_user where account = #{account}")
+    List<User> getUserByAccount(@Param("account") String account);
 }

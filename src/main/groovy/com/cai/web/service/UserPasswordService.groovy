@@ -18,7 +18,7 @@ class UserPasswordService extends BaseService<UserPassword>{
     UserPasswordMapper userPasswordMapper
 
     @Override
-    ResponseMessage afterCreate(Session sess, UserPassword obj) {
+    ResponseMessage beforeCreate(Session sess, UserPassword obj) {
         long res = userPasswordMapper.countByUserId(obj.userId)
         if (res > 0)
             return ResponseMessageFactory.error(UserPasswordMessage.ERROR.USER_PASSWORD_ERROR_0001)
@@ -30,6 +30,15 @@ class UserPasswordService extends BaseService<UserPassword>{
         try{
             userPasswordMapper.deleteByUserId(userId)
             return ResponseMessageFactory.success()
+        }catch(Throwable t){
+            t.printStackTrace()
+            ErrorLogManager.logException(sess, t)
+        }
+    }
+
+    UserPassword getUserPassByAccount(Session sess, long id){
+        try{
+            return userPasswordMapper.getUserPassByUserId(id)
         }catch(Throwable t){
             t.printStackTrace()
             ErrorLogManager.logException(sess, t)
