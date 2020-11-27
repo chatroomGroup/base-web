@@ -3,6 +3,8 @@ package com.cai.web.interceptor
 import com.cai.general.core.App
 import com.cai.general.core.Session
 import com.cai.general.util.log.ErrorLogManager
+import com.cai.general.util.response.ResponseMessage
+import com.cai.general.util.response.ResponseMessageFactory
 import com.cai.redis.RedisService
 import com.cai.redis.op.OpJedis
 import com.cai.web.core.ErrorStatusBuilder
@@ -25,6 +27,7 @@ import org.springframework.web.servlet.handler.HandlerInterceptorAdapter
 import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
+import javax.xml.ws.Response
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.concurrent.atomic.AtomicReference
@@ -68,32 +71,46 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
         String client = request.getHeader("x-client")?:getIPAddress(request)
         String port = request.getHeader("x-port")?:request.getRemotePort()
         try{
-            return redisService.tryAndGetOpJedis{op->
+            ResponseMessage res =  redisService.tryAndGetOpJedis{ op->
                 if (!user || !token){
                     ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0001, HttpServletResponse.SC_UNAUTHORIZED as String, request.getServletPath())
                     errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
-                    return false
+                    return ResponseMessageFactory.error(null)
                 }
                 String userStr = op.get(OnlineUserDomain.getAuthCacheKey(user, token) as String)
                 if (!userStr){
                     ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0002, HttpServletResponse.SC_UNAUTHORIZED as String, request.getServletPath())
                     errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
-                    return false
+                    return ResponseMessageFactory.error(null)
                 }
 //        OnlineUserDomain userDomain = RedisService.unSerialize(userStr, OnlineUserDomain)
                 if (!op.get(OnlineUserDomain.getTimeoutCacheKey(user, token) as String)){
                     op.del(OnlineUserDomain.getAuthCacheKey(user, token) as String)
                     ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0004, HttpServletResponse.SC_REQUEST_TIMEOUT as String, request.getServletPath())
                     errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
-                    return false
+                    return ResponseMessageFactory.error(null)
                 }
                 if (op.get(OnlineUserDomain.getAccessCacheKey(user, token) as String)){
                     ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0003, HttpServletResponse.SC_UNAUTHORIZED as String, request.getServletPath())
                     errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
-                    return false
+                    return ResponseMessageFactory.error(null)
                 }
                 saveSession(request, createSession(user, token, app, client, port, locale))
-                return true
+                return ResponseMessageFactory.success(null)
+            }
+            if (res.isError){
+                return false
+            } else{
+                redisService.tryOpJedis{op->
+                    Set<String> ops = []
+                    ops = op.keys("*AUTH:$user*")
+                    if (ops.size() > 1){
+                        ops = ops.findAll{ it != OnlineUserDomain.getAuthCacheKey(user, token)}.toSet()
+                        String [] keys = new String[ops.size()]
+                        ops.toArray(keys)
+                        op.del(keys)
+                    }
+                }
             }
         }catch(Throwable t){
             Session sess = new Session()

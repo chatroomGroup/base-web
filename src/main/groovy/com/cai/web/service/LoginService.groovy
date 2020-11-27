@@ -11,6 +11,7 @@ import com.cai.redis.RedisService
 import com.cai.web.core.CacheEntity
 import com.cai.web.core.CacheKey
 import com.cai.web.core.IgnoreAuthStore
+import com.cai.web.core.log.LoginHistory
 import com.cai.web.dao.UserMapper
 import com.cai.web.domain.CallRedisLog
 import com.cai.web.domain.OnlineUserDomain
@@ -48,9 +49,17 @@ class LoginService extends BaseService{
         Jedis jedis = redisService.getJedis()
         getKeys(onlineUserDomain).each {it->
             Object res = jedis.eval("""return redis.call($it)""")
-            ac.publishEvent(new CallRedisLog(it, res))
+            ac.publishEvent(new CallRedisLog(null, it, res))
         }
         jedis.close()
+    }
+
+
+    void destroyCache(OnlineUserDomain onlineUserDomain){
+        redisService.tryOpJedis{jedis->
+            String[] ops = [onlineUserDomain.getTimeoutCacheKey(), onlineUserDomain.getAccessCacheKey(), onlineUserDomain.getAuthCacheKey()]
+            jedis.del(ops)
+        }
     }
 
     private List getKeys(CacheEntity th){

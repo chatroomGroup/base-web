@@ -2,6 +2,7 @@ package com.cai.web.controller
 
 import com.cai.general.core.App
 import com.cai.general.core.BaseController
+import com.cai.general.core.Session
 import com.cai.general.util.encode.PasswordUtil
 import com.cai.general.util.response.ResponseMessage
 import com.cai.general.util.response.ResponseMessageFactory
@@ -9,6 +10,8 @@ import com.cai.redis.RedisLockService
 import com.cai.web.core.IgnoreAuth
 import com.cai.web.core.IgnoreAuthStore
 import com.cai.web.core.ReturnToken
+import com.cai.web.core.log.LoginHistory
+import com.cai.web.core.log.SignOutHistory
 import com.cai.web.dao.UserMapper
 import com.cai.web.domain.OnlineUserDomain
 import com.cai.web.domain.Status
@@ -32,6 +35,7 @@ import javax.servlet.http.HttpServletResponse
 import java.util.concurrent.atomic.AtomicReference
 
 import static com.cai.general.util.session.SessionUtils.createSession
+import static com.cai.general.util.session.SessionUtils.destroySession
 import static com.cai.general.util.session.SessionUtils.saveSession
 
 @RestController
@@ -47,6 +51,12 @@ class LoginController extends BaseController{
     @Autowired
     App app
 
+    @Autowired
+    LoginHistory loginHistory
+
+    @Autowired
+    SignOutHistory signOutHistory
+
     @IgnoreAuth
     @ReturnToken
     @RequestMapping(path = "/login", method = RequestMethod.POST)
@@ -60,8 +70,12 @@ class LoginController extends BaseController{
         String password = params.get("password")
         rsp = loginService.login(null, account, password)
         // 第一次登陆 需要创建session
-        String token = ignoreAuthStore.returnToken(request.getServletPath())
-        saveSession(request, createSession(account, token, app.name, null, null, null))
+        if (rsp.isSuccess){
+            String token = ignoreAuthStore.returnToken(request.getServletPath())
+            saveSession(request, createSession(account, token, app.name, null, null, null))
+            Session sess = getSession(request)
+            loginHistory.logProcess(sess)
+        }
         return rsp
     }
 
@@ -69,5 +83,14 @@ class LoginController extends BaseController{
     ResponseMessage test2(HttpServletRequest request){
         println getSession(request)
         return ResponseMessageFactory.success("login")
+    }
+
+    @RequestMapping(path = "/signOut")
+    ResponseMessage signOut(HttpServletRequest request){
+        Session session = getSession(request)
+        loginService.destroyCache(new OnlineUserDomain(session.user, new AtomicReference<String>(session.token)))
+        signOutHistory.logProcess(session, session.user)
+        destroySession(request)
+        return ResponseMessageFactory.success("signOut")
     }
 }

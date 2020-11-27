@@ -71,11 +71,12 @@ class BaseWebApplicationTests {
     }
 
     @Test
-    void getEntity(){
+    void getEntity() {
         User user = new User()
         user.id = 1L
         user = usSvc.getEntity(sess, user)
         user = usSvc.getEntity(sess, user)
         println user
     }
+
 }

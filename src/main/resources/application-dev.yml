@@ -1,0 +1,9 @@
+server:
+  tomcat:
+    max-connections: 1
+    accept-count: 0
+    max-threads: 1
+    connection-timeout: 1000
+
+
+

@@ -1,6 +1,10 @@
 
 server:
   port: 9020
+  tomcat:
+    max-connections: 1
+    accept-count: 0
+    max-threads: 1
 
 app:
   name: base-web
@@ -27,9 +31,20 @@ redis:
   timeout: 0
   connectionPoolSize: 400
 
+ais.mq:
+  host: localhost # connection host
+  port: 5672 # 5772 # connection port
+  username: guest
+  password: guest
+  concurrency: 10
+  maxConcurrency: 10
+  virtualHost: /api-game-2
+
 spring:
   main:
     allow-bean-definition-overriding: true
+  profiles:
+    active: dev
 #  jpa:
 #    hibernate:
 #      naming:
@@ -67,3 +82,4 @@ mongo:
   username:
   authenticationDatabase:
   connectionPerHost: 5
+
