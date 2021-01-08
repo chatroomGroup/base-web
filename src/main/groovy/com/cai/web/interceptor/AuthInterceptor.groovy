@@ -83,7 +83,6 @@ class AuthInterceptor extends HandlerInterceptorAdapter{
                     errorService.createErrorForward(ErrorMapping.error4xx, request, response).forward(wrapper)
                     return ResponseMessageFactory.error(null)
                 }
-//        OnlineUserDomain userDomain = RedisService.unSerialize(userStr, OnlineUserDomain)
                 if (!op.get(OnlineUserDomain.getTimeoutCacheKey(user, token) as String)){
                     op.del(OnlineUserDomain.getAuthCacheKey(user, token) as String)
                     ErrorStatusWrapper wrapper = ErrorStatusBuilder.builder(WebMessage.ERROR.MSG_ERROR_0004, HttpServletResponse.SC_REQUEST_TIMEOUT as String, request.getServletPath())
