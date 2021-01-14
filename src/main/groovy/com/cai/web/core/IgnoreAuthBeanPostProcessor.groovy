@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Controller
+import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -47,9 +48,73 @@ class IgnoreAuthBeanPostProcessor implements BeanPostProcessor{
 
     String getPath(RequestMapping mapping){
         if (mapping.value())
-            return mapping.value()[0]
+            return matchDynamicCode(mapping.value()[0])
         if (mapping.path())
-            return mapping.path()[0]
+            return matchDynamicCode(mapping.path()[0])
         return ""
+    }
+
+    /**
+     * 针对 @PathVariable 的情况下，动态的判断path
+     * @param path
+     * @return
+     */
+    // /1/2/{3}/{4} => /1/2/*/*  //
+    static String matchDynamicCode(String path){
+        String val = path
+        Stack<Node> stack = new Stack()
+        List<Integer> target = []
+        List<String> group = path.split("/")
+        for (int j = 1 ; j < group.size(); j++){
+            for (int i = 0 ; i < group[j].length() ; i++){
+                if("{" == group[j][i]){
+                    if (stack.empty()){
+                        stack.push(new Node("{", i, j))
+                        continue
+                    }
+                    Node previous = stack.pop()
+                    if(previous && "{" == previous.target){
+                        stack.push(previous)
+                        continue
+                    }
+                    stack.push(new Node("{", i, j))
+                } else if("}" == group[j][i]){
+                    if (stack.empty()){
+                        break
+                    }
+                    Node previous = stack.pop()
+                    if (previous && "{" == previous.target
+                            && previous.group == j
+                            && previous.position == 0
+                            && i == group[j].length() - 1){
+                        target.add(j)
+                    }else{
+                        stack.push(new Node("}", i, j))
+                    }
+                }
+            }
+
+        }
+
+        target.each {it->
+            group[it] = "*"
+        }
+        return group.join("/")
+    }
+
+
+}
+
+class Node{
+    String target
+
+    Integer position
+
+    Integer group
+
+    Node(String target, Integer position, Integer group) {
+        this.target = target
+        this.position = position
+        this.group = group
     }
 }
