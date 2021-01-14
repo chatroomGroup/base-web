@@ -11,6 +11,8 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.web.method.support.HandlerMethodReturnValueHandler
+import org.springframework.web.multipart.MultipartResolver
+import org.springframework.web.multipart.support.StandardServletMultipartResolver
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter
 
@@ -48,6 +50,12 @@ class WebMvcConfiguration extends WebMvcConfigurationSupport {
             newHandlers.add(returnHandler as HandlerMethodReturnValueHandler);
         }
         requestMappingHandlerAdapter.setReturnValueHandlers(newHandlers as List<HandlerMethodReturnValueHandler>);
+    }
+
+    @Bean
+    MultipartResolver multipartResolver() {
+        StandardServletMultipartResolver multipartResolver = new StandardServletMultipartResolver()
+        return multipartResolver
     }
 
 }

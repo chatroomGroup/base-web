@@ -1,4 +1,4 @@
-package com.cai.web.controller
+package com.cai.web.service
 
 import com.cai.general.util.log.ErrorLogManager
 import com.cai.general.util.response.ResponseMessage
@@ -6,6 +6,7 @@ import com.cai.general.util.response.ResponseMessageFactory
 import com.cai.mongo.service.MongoService
 import com.cai.web.core.IgnoreAuth
 import com.cai.web.message.WebMessage
+import org.apache.tomcat.util.http.fileupload.IOUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -15,30 +16,33 @@ import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartHttpServletRequest
 
 import javax.servlet.http.HttpServletRequest
-
+import javax.servlet.http.HttpServletResponse
 
 @RestController
-@RequestMapping(value = "/rest/upload")
-class UploadController {
+@RequestMapping(value = "/rest/download")
+class DownloadController {
+
 
     @Autowired
     MongoService mongoService
 
     @IgnoreAuth
-    @RequestMapping(value = "/{parent}", method = RequestMethod.POST)
-    ResponseMessage upload(HttpServletRequest request, @PathVariable String parent){
-//        MultipartHttpServletRequest mulReq=(MultipartHttpServletRequest)request
+    @RequestMapping(value = "/{parent}/{name}", method = RequestMethod.POST)
+    ResponseMessage download(HttpServletRequest request, HttpServletResponse response, @PathVariable String parent , @PathVariable String name){
+        InputStream is
+        OutputStream os
         try{
-            Map<String,MultipartFile> files = ((MultipartHttpServletRequest) request).getFileMap()
-            files.each {k,v->
-                mongoService.gridFsUploadStream(v.getInputStream(), k, parent, null)
-            }
+            is = mongoService.gridFsFindFileByName(name, parent)
+            os = response.outputStream
+            IOUtils.copy(is, os)
             return ResponseMessageFactory.success()
         }catch(Throwable t){
             ErrorLogManager.logException(null, t)
             return ResponseMessageFactory.error(WebMessage.ERROR.MSG_ERROR_0000)
+        }finally{
+            is?.close()
+            os?.close()
         }
 
     }
-
 }
