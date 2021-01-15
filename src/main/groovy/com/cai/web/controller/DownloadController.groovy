@@ -27,12 +27,32 @@ class DownloadController {
     MongoService mongoService
 
     @IgnoreAuth
-    @RequestMapping(value = "/{parent}/{name}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{parent}/{name}", method = RequestMethod.GET)
     String download(HttpServletRequest request, HttpServletResponse response, @PathVariable String parent , @PathVariable String name){
         InputStream is
         OutputStream os
         try{
             is = mongoService.gridFsFindFileByName(name, parent)
+            os = response.outputStream
+            IOUtils.copy(is, os)
+            return null
+        }catch(Throwable t){
+            ErrorLogManager.logException(null, t)
+            return null
+        }finally{
+            is?.close()
+            os?.close()
+        }
+
+    }
+
+    @IgnoreAuth
+    @RequestMapping(value = "/{db}/{parent}/{name}", method = RequestMethod.GET)
+    String downloadByDB(HttpServletRequest request, HttpServletResponse response, @PathVariable String db , @PathVariable String parent , @PathVariable String name){
+        InputStream is
+        OutputStream os
+        try{
+            is = mongoService.gridFsFindFileByName(db, name, parent)
             os = response.outputStream
             IOUtils.copy(is, os)
             return null

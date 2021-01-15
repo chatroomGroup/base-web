@@ -10,10 +10,6 @@ class IgnoreAuthStore {
 
     Map chains= [:]
 
-    Map mappingTable = [:]
-
-    static Random random = new Random()
-
     @PostConstruct
     void init(){
         addIgnoreAuthMapping("/error", false)
@@ -41,13 +37,6 @@ class IgnoreAuthStore {
                 tail.put(it,[:])
             tail = tail[it]
         }
-    }
-
-    public static void main(String[] args) {
-        IgnoreAuthStore store = new IgnoreAuthStore()
-        store.fillChain(IgnoreAuthBeanPostProcessor.matchDynamicCode("/cai/2/{1}/{2}").split("/").toList())
-        store.fillChain(IgnoreAuthBeanPostProcessor.matchDynamicCode("/cai//2/{2}").split("/").toList())
-
     }
 
     MappingWrapper getMapping(String mapping){

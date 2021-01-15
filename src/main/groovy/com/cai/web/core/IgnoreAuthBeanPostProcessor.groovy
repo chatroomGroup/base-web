@@ -22,29 +22,46 @@ class IgnoreAuthBeanPostProcessor implements BeanPostProcessor{
     IgnoreAuthStore ignoreAuthStore
 
     @Override
-    Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+    Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
         try{
-            if (bean.class.isAnnotationPresent(IgnoreAuth)){
-                bean.class.getMethods().toList().each {it->
-                    if (it.isAnnotationPresent(RequestMapping)){
-                        String rootMap = getPath(bean.class.getAnnotation(RequestMapping))
-                        ignoreAuthStore.addIgnoreAuthMapping(rootMap + getPath(it.getAnnotation(RequestMapping)), it.isAnnotationPresent(ReturnToken))
-                    }
-                }
-                return bean
-            }
-            if (bean.class.isAnnotationPresent(RestController) || bean.class.isAnnotationPresent(Controller)){
-                bean.class.getMethods().toList().each {it->
-                    if (it.isAnnotationPresent(IgnoreAuth) && it.isAnnotationPresent(RequestMapping)){
-                        String rootMap = getPath(bean.class.getAnnotation(RequestMapping))
-                        ignoreAuthStore.addIgnoreAuthMapping(rootMap + getPath(it.getAnnotation(RequestMapping)), it.isAnnotationPresent(ReturnToken))
-                    }
-                }
-            }
+            checkBean(bean,beanName)
             return bean
         }catch(Throwable t){}
         return bean
     }
+
+
+//    @Override
+//    Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+//        try{
+//            checkBean(bean,beanName)
+//            return bean
+//        }catch(Throwable t){}
+//        return bean
+//    }
+
+    void checkBean(Object bean, String beanName){
+        println beanName
+        if (bean.class.isAnnotationPresent(IgnoreAuth)){
+            bean.class.getMethods().toList().each {it->
+                if (it.isAnnotationPresent(RequestMapping)){
+                    println "--------------------------------------------${beanName}"
+                    String rootMap = getPath(bean.class.getAnnotation(RequestMapping))
+                    ignoreAuthStore.addIgnoreAuthMapping(rootMap + getPath(it.getAnnotation(RequestMapping)), it.isAnnotationPresent(ReturnToken))
+                }
+            }
+        }
+        if (bean.class.isAnnotationPresent(RestController) || bean.class.isAnnotationPresent(Controller)){
+            bean.class.getMethods().toList().each {it->
+                if (it.isAnnotationPresent(IgnoreAuth) && it.isAnnotationPresent(RequestMapping)){
+                    println "----------${beanName}"
+                    String rootMap = getPath(bean.class.getAnnotation(RequestMapping))
+                    ignoreAuthStore.addIgnoreAuthMapping(rootMap + getPath(it.getAnnotation(RequestMapping)), it.isAnnotationPresent(ReturnToken))
+                }
+            }
+        }
+    }
+
 
     String getPath(RequestMapping mapping){
         if (mapping.value())
