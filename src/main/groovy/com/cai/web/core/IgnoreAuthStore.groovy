@@ -10,6 +10,10 @@ class IgnoreAuthStore {
 
     Map chains= [:]
 
+    Map mappingTable = [:]
+
+    static Random random = new Random()
+
     @PostConstruct
     void init(){
         addIgnoreAuthMapping("/error", false)
@@ -47,8 +51,9 @@ class IgnoreAuthStore {
     }
 
     MappingWrapper getMapping(String mapping){
+        def dynamicPath = buildMapping(mapping)
         return store.find {it->
-            it.mapping == mapping
+            it.mapping == dynamicPath
         }
     }
 
@@ -56,18 +61,30 @@ class IgnoreAuthStore {
 //        return store.find {it->
 //            it.mapping == mapping
 //        } != null
-        List<String> group = mapping.split("/")
+        if (buildMapping(mapping))
+            return true
+        return false
+    }
+
+    def buildMapping(String path){
+        List<String> group = path.split("/")
+        List<String> res = []
         Map<String,Map> tail = chains
         for(int i = 0 ; i < group.size() ; i++){
             if (tail[group[i]] == null  && tail["*"] == null)
-                return false
-            if(tail[group[i]] != null)
+                return null
+            if(tail[group[i]] != null){
                 tail = tail[group[i]]
-            else
+                res.add(group[i])
+            }
+            else{
                 tail = tail["*"]
+                res.add("*")
+            }
         }
-        return true
+        return res.join("/")
     }
+
 
     String returnToken(String mapping) {
         MappingWrapper wrapper = getMapping(mapping)

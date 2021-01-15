@@ -1,4 +1,4 @@
-package com.cai.web.service
+package com.cai.web.controller
 
 import com.cai.general.util.log.ErrorLogManager
 import com.cai.general.util.response.ResponseMessage
@@ -28,17 +28,17 @@ class DownloadController {
 
     @IgnoreAuth
     @RequestMapping(value = "/{parent}/{name}", method = RequestMethod.POST)
-    ResponseMessage download(HttpServletRequest request, HttpServletResponse response, @PathVariable String parent , @PathVariable String name){
+    String download(HttpServletRequest request, HttpServletResponse response, @PathVariable String parent , @PathVariable String name){
         InputStream is
         OutputStream os
         try{
             is = mongoService.gridFsFindFileByName(name, parent)
             os = response.outputStream
             IOUtils.copy(is, os)
-            return ResponseMessageFactory.success()
+            return null
         }catch(Throwable t){
             ErrorLogManager.logException(null, t)
-            return ResponseMessageFactory.error(WebMessage.ERROR.MSG_ERROR_0000)
+            return null
         }finally{
             is?.close()
             os?.close()
