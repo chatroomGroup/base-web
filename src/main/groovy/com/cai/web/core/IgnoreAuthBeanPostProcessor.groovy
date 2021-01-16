@@ -3,6 +3,7 @@ package com.cai.web.core
 import org.springframework.beans.BeansException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.BeanPostProcessor
+import org.springframework.beans.factory.config.InstantiationAwareBeanPostProcessor
 import org.springframework.context.ApplicationContext
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
@@ -11,9 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
-@Order(value = Integer.MIN_VALUE)
-@Component
-class IgnoreAuthBeanPostProcessor implements BeanPostProcessor{
+class IgnoreAuthBeanPostProcessor implements InstantiationAwareBeanPostProcessor{
 
     @Autowired
     ApplicationContext ac
@@ -22,7 +21,7 @@ class IgnoreAuthBeanPostProcessor implements BeanPostProcessor{
     IgnoreAuthStore ignoreAuthStore
 
     @Override
-    Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+    Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
         try{
             checkBean(bean,beanName)
             return bean
@@ -31,14 +30,14 @@ class IgnoreAuthBeanPostProcessor implements BeanPostProcessor{
     }
 
 
-//    @Override
-//    Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-//        try{
-//            checkBean(bean,beanName)
-//            return bean
-//        }catch(Throwable t){}
-//        return bean
-//    }
+    @Override
+    Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        try{
+            return bean
+        }catch(Throwable t){}
+        return bean
+    }
+
 
     void checkBean(Object bean, String beanName){
         println beanName

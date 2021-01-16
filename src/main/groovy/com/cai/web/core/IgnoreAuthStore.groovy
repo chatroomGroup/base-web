@@ -4,7 +4,6 @@ import org.springframework.stereotype.Component
 
 import javax.annotation.PostConstruct
 
-@Component
 class IgnoreAuthStore {
     Collection<MappingWrapper> store = []
 
