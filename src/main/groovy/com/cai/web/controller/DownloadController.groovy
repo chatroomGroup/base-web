@@ -32,6 +32,7 @@ class DownloadController {
         InputStream is
         OutputStream os
         try{
+            response.setHeader("Content-Disposition","attachment; filename=\"$name\"")
             is = mongoService.gridFsFindFileByName(name, parent)
             os = response.outputStream
             IOUtils.copy(is, os)

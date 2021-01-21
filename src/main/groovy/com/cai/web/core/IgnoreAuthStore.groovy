@@ -79,7 +79,7 @@ class IgnoreAuthStore {
         if (wrapper && wrapper.isReturnToken){
             return UUID.randomUUID().toString().replace("-", "")
         }
-    }
+    }   
 
     boolean hasReturnToken(String mapping){
         return store.find {it->
