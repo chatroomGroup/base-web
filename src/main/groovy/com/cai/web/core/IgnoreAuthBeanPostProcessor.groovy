@@ -40,11 +40,11 @@ class IgnoreAuthBeanPostProcessor implements InstantiationAwareBeanPostProcessor
 
 
     void checkBean(Object bean, String beanName){
-        println beanName
+//        println beanName
         if (bean.class.isAnnotationPresent(IgnoreAuth)){
             bean.class.getMethods().toList().each {it->
                 if (it.isAnnotationPresent(RequestMapping)){
-                    println "--------------------------------------------${beanName}"
+//                    println "--------------------------------------------${beanName}"
                     String rootMap = getPath(bean.class.getAnnotation(RequestMapping))
                     ignoreAuthStore.addIgnoreAuthMapping(rootMap + getPath(it.getAnnotation(RequestMapping)), it.isAnnotationPresent(ReturnToken))
                 }

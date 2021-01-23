@@ -1,11 +1,11 @@
 package com.cai.web.controller
 
 import com.cai.general.core.App
-import com.cai.general.core.BaseController
 import com.cai.general.core.Session
 import com.cai.general.util.encode.PasswordUtil
 import com.cai.general.util.response.ResponseMessage
 import com.cai.general.util.response.ResponseMessageFactory
+import com.cai.general.util.session.SessionUtils
 import com.cai.redis.RedisLockService
 import com.cai.web.core.IgnoreAuth
 import com.cai.web.core.IgnoreAuthStore

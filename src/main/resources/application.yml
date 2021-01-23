@@ -18,12 +18,12 @@ login:
 
 web:
   accessInterval: 1000 # ms
-  isLoose: false
+  isLoose: true
 
 redis:
-  host: localhost
-  port: 6380
-  password:
+  host: 122.51.230.174 #localhost
+  port: 36381
+  password: 123
   database: 3
   max-active: 200
   max-wait: -1
@@ -83,3 +83,6 @@ mongo:
   authenticationDatabase:
   connectionPerHost: 5
 
+reactor:
+  threadOfNumber: 10
+  agent: com.cai.reactor.core.ParallelAgent

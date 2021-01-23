@@ -40,7 +40,7 @@ allprojects {
         compile group: 'com.cai', name: 'base-jdbc', version: '3.0.5-SNAPSHOT', changing: true
         compile group: 'com.cai', name: 'base-mongo', version: '1.6.5-SNAPSHOT', changing: true
         compile group: 'com.cai', name: 'base-cache', version: '0.0.0.15-SNAPSHOT', changing: true
-
+        compile group: 'com.cai', name: 'reactor-core', version: '0.0.5-SNAPSHOT', changing: true
         compile group: 'org.apache.commons', name: 'commons-pool2', version: '2.7.0'
     }
 

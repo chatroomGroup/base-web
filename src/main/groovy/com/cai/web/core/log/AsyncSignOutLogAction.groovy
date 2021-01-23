@@ -3,6 +3,7 @@ package com.cai.web.core.log
 import com.cai.general.util.async.SerialAction
 import com.cai.general.util.log.LogParser
 
+@Deprecated
 class AsyncSignOutLogAction implements SerialAction {
 
     static String LOGIN_LOG_COLLECTION = "user_sign_out"

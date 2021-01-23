@@ -5,6 +5,8 @@ import com.cai.general.core.Session
 import com.cai.general.util.async.AsyncUtils
 import com.cai.general.util.log.LogParser
 import com.cai.mongo.service.MongoService
+import com.cai.reactor.core.AbstractEvent
+import com.cai.reactor.core.Publisher
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -17,9 +19,25 @@ class LoginHistory {
     @Autowired
     LogParser logParser
 
+    @Autowired
+    Publisher publisher
+
     void logProcess(Session sess){
         if (!sess.user)
             return
-        AsyncUtils.asyncOnlyPool(new AsyncLoginLogAction(), [logParser: logParser, user: sess.user, token: sess.token?:"", app: app.name?:""])
+        SignInEvent event = new SignInEvent()
+        event.setParams([logParser: logParser, user: sess.user, token: sess.token?:"", app: app.name?:""])
+//        AsyncUtils.asyncOnlyPool(new AsyncLoginLogAction(), [logParser: logParser, user: sess.user, token: sess.token?:"", app: app.name?:""])
+        publisher.publish(event)
     }
+}
+
+@Component
+class SignInEvent extends AbstractEvent{
+
+    @Override
+    String topic() {
+        return "user.sign.in"
+    }
+
 }

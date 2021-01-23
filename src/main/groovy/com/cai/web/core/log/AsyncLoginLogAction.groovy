@@ -6,6 +6,7 @@ import com.cai.mongo.service.MongoService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
+@Deprecated
 class AsyncLoginLogAction implements SerialAction {
 
     static String LOGIN_LOG_COLLECTION = "user_login"
