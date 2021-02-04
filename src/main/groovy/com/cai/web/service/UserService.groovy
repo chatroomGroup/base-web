@@ -3,6 +3,7 @@ package com.cai.web.service
 import com.cai.general.core.BaseService
 import com.cai.general.core.Session
 import com.cai.general.util.log.ErrorLogManager
+import com.cai.general.util.response.Errors
 import com.cai.general.util.response.ResponseMessage
 import com.cai.general.util.response.ResponseMessageFactory
 import com.cai.web.dao.UserMapper
@@ -22,10 +23,16 @@ class UserService extends BaseService<User>{
     UserPasswordService upSvc
 
     @Override
-    ResponseMessage beforeCreate(Session sess, User obj) {
-        if (!userMapper.existsByAccount(obj.account).empty)
-            return ResponseMessageFactory.error(UserMessage.ERROR.USER_ERROR_0001, obj.account)
-        return ResponseMessageFactory.success()
+    Errors validateEntity(Session sess, User entity, Errors errors) {
+        try{
+            if (!userMapper.existsByAccount(entity.account).empty)
+                errors.reject(UserMessage.ERROR.USER_ERROR_0001, entity.account)
+            def i = 1/0
+        }catch(Throwable t){
+            ErrorLogManager.logException(sess, t)
+            errors.reject(WebMessage.ERROR.MSG_ERROR_0000)
+        }
+        errors
     }
 
     @Override
